@@ -1,25 +1,30 @@
 #include "hashlib.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #define mod %
 
-int *t1, *t2 ;
+nodo_t *t1, *t2 ;
 
 /*
  * Inicializa as tabelas hash t1 e t2
  */
 int init_ht() {
-    t1 = (int *) malloc(M * sizeof(int)) ;
+    t1 = malloc(M * sizeof(nodo_t)) ;
     if (!t1) {
         perror("Impossível alocar t1\n") ;
         return 0 ;
     }
 
-    t2 = (int *) malloc(M * sizeof(int)) ;
+    t2 = malloc(M * sizeof(nodo_t)) ;
     if (!t2) {
         perror("Impossível alocar t2\n") ;
         return 0 ;
     }
+
+    for(int i = 0; i < M; i++)
+        t1[i].ocp = t2[i].ocp = 0 ;
+    return 1 ;
 }
 //##############################################################################
 
@@ -41,9 +46,13 @@ void free_ht(){
  */
 void print_ht(){
     for(int i = 0; i<M; i++){
-        printf("T1[%2d] = %d", i, t1[i]) ;
+        if(t1[i].ocp){
+            printf("T1[%2d] = %d", i, t1[i].v) ;
+        } else printf("T1[%2d] LIVRE", i) ;
         printf("\t\t") ;
-        printf("T2[%2d] = %d", i, t2[i]) ;
+        if(t2[i].ocp){
+            printf("T2[%2d] = %d", i, t2[i].v) ;
+        } else printf("T2[%2d] LIVRE", i) ;
         printf("\n") ;
     }
 }
@@ -52,22 +61,24 @@ void print_ht(){
 
 
 /*
- * Inserção de elementos 
+ * Inserção de elementos
  */
 int h1(int key){
     int pos = key mod M ;
-    if(t1[pos] != 0)
-        return 0 ;
-    t1[pos] = key ; 
     return pos ;
 }
 int h2(int key){
-    int pos = ((int) M * ((int) ((key * 0.9) - ((int) key * 0.9)))) ;
-    t2[pos] = key ;
+    int pos = floor(M * (key * 0.9 - floor(key * 0.9))) ;
     return pos ;
 }
 int include_ht(int key){
-    if(!h1(key))
-        h2(key) ;
-    return 0 ;
+    int pos1 = h1(key) ;
+    if(t1[pos1].ocp){
+        int pos2 = h2(t1[pos1].v) ;
+        t2[pos2].v = t1[pos1].v ;
+        t2[pos2].ocp = 1 ;
+    }
+    t1[pos1].v = key ;
+    t1[pos1].ocp = 1 ;
+    return pos1 ;
 }
