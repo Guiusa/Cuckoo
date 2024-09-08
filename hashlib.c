@@ -61,7 +61,7 @@ void print_ht(){
 
 
 /*
- * Inserção de elementos
+ * Funções de hashing
  */
 int h1(int key){
     int pos = key mod M ;
@@ -71,6 +71,13 @@ int h2(int key){
     int pos = floor(M * (key * 0.9 - floor(key * 0.9))) ;
     return pos ;
 }
+//##############################################################################
+
+
+
+/*
+ * Inserção de elementos
+ */
 int include_ht(int key){
     int pos1 = h1(key) ;
     if(t1[pos1].ocp){
@@ -82,3 +89,33 @@ int include_ht(int key){
     t1[pos1].ocp = 1 ;
     return pos1 ;
 }
+//##############################################################################
+
+
+
+/*
+ * Busca de elementos
+ */
+int search_ht(int key){
+    int pos1 = h1(key) ;
+    if(!t1[pos1].ocp) return -1 ;
+    if(t1[pos1].v == key) return pos1 ;
+    int pos2 = h2(key) ;
+    if(t2[pos2].v == key) return pos2 ;
+    return -1 ;
+}
+//##############################################################################
+
+
+
+/*
+ * Exclui um elemento
+ */
+int remove_ht(int key){
+    int pos2 = h2(key) ;
+    if(t2[pos2].v == key && t2[pos2].ocp){
+        t2[pos2].ocp = 0 ;
+        return pos2 ;
+    }
+}
+//##############################################################################

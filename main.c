@@ -12,6 +12,10 @@ int main(){
 
     print_ht() ;
 
+    remove_ht(4) ;
+    printf("\n\n") ;
+    print_ht() ;
+
     free_ht() ;
     return 0 ;
 }
