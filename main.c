@@ -6,6 +6,7 @@ int main(){
 
     char c ;
     int k ;
+
     c = getchar() ;
     while(c != EOF){
         scanf(" %d\n", &k) ;
