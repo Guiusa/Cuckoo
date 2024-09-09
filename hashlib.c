@@ -3,8 +3,11 @@
 #include <stdio.h>
 #include <math.h>
 #define mod %
+#define TRUE 1
+#define FALSE 0
 
 nodo_t *t1, *t2 ;
+pnode_t *l ;
 
 /*
  * Inicializa as tabelas hash t1 e t2
@@ -42,13 +45,38 @@ void free_ht(){
 
 
 /*
- * Printa hash tables para depuração
+ * Printa hash table
  */
+int comp(const void *frst, const void *scnd){
+    pnode_t p1 = * (pnode_t *) frst ;
+    pnode_t p2 = * (pnode_t *) scnd ;
+    if(p1.v > p2.v){
+        return TRUE ;
+    } else if (p1.v < p2.v) {
+        return FALSE ;
+    }
+    return TRUE ;
+}
 void print_ht(){
-    for(int i = 0; i<M; i++)
-        if(t1[i].ocp == 1) printf("%d,T1,%d\n", t1[i].v, i) ;
-    for(int i = 0; i<M; i++)
-        if(t2[i].ocp == 1) printf("%d,T2,%d\n", t2[i].v, i) ;
+    l = malloc(2 * M * sizeof(pnode_t)) ;
+    int c = 0 ;
+    for(int i = 0; i<M; i++){
+        if(t1[i].ocp == 1){
+            l[c].v = t1[i].v ;
+            l[c].table = 1 ;
+            l[c].p = i ;
+            c++ ;
+        }
+        if(t2[i].ocp == 1){
+            l[c].v = t2[i].v ;
+            l[c].table = 2 ;
+            l[c].p = i ;
+            c++ ;
+        }
+    }
+    qsort((void *) l, c, sizeof(pnode_t), comp) ;
+    for(int i = 0; i<c; i++) printf("%d,T%d,%d\n", l[i].v, l[i].table, l[i].p) ;
+    free(l) ;
 }
 //##############################################################################
 
@@ -74,7 +102,7 @@ int h2(int key){
  */
 int include_ht(int key){
     int pos1 = h1(key) ;
-    if(t1[pos1].ocp){
+    if(t1[pos1].ocp == 1){
         int pos2 = h2(t1[pos1].v) ;
         t2[pos2].v = t1[pos1].v ;
         t2[pos2].ocp = 1 ;
@@ -108,7 +136,7 @@ int search_ht(int key){
 int remove_ht(int key){
     int pos2 = h2(key) ;
     if(t2[pos2].v == key && t2[pos2].ocp){
-        t2[pos2].ocp = 0 ;
+        t2[pos2].ocp = 2 ;
         return pos2 ;
     }
     int pos1 = h1(key) ;
@@ -117,5 +145,43 @@ int remove_ht(int key){
         return pos1 ;
     }
     return -1 ;
+}
+//##############################################################################
+
+
+
+/*
+ * Depuração
+ */
+void debug_ht(){
+    for(int i = 0; i<M; i++){
+        printf("t1[%2d]", i) ;
+        switch (t1[i].ocp){
+        case 0:
+            printf(" LIVRE") ;
+            break ;
+        case 1:
+            printf(" = %3d", t1[i].v) ;
+            break ;
+        case 2:
+            printf(" EXCLUIDO") ;
+            break ;
+        }
+        printf("\t\t") ;
+        printf("t2[%2d]", i) ;
+        switch (t2[i].ocp){
+        case 0:
+            printf(" LIVRE") ;
+            break ;
+        case 1:
+            printf(" = %3d", t2[i].v) ;
+            break ;
+        case 2:
+            printf(" EXCLUIDO") ;
+            break ;
+        }
+        printf("\n") ;
+    }
+    printf("\n\n") ;
 }
 //##############################################################################
